@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D2ABAB84-BF74-430A-B69E-9DC6D40DDA17}") = "OLAP_SSAS", "OLAP_SSAS.dwproj", "{17E7FAA3-68FA-407D-9C05-99F23BE4CADB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17E7FAA3-68FA-407D-9C05-99F23BE4CADB}.Development|Default.ActiveCfg = Development
+		{17E7FAA3-68FA-407D-9C05-99F23BE4CADB}.Development|Default.Build.0 = Development
+		{17E7FAA3-68FA-407D-9C05-99F23BE4CADB}.Development|Default.Deploy.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4207C9F3-497F-4AB7-B8C6-1393A4D98630}
+	EndGlobalSection
+EndGlobal

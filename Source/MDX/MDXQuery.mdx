@@ -1,0 +1,96 @@
+﻿-- cau 1 Thống kê top 5 thành phố ở bang California có số lượng chuyến bay đến nhiều nhất   (drilldown)
+SELECT [Measures].[Fact Count] ON 0,
+   TOPCOUNT(	 	
+      [Origin].[City Name].CHILDREN, 
+      5,
+	  [Origin].[City Code]
+   ) ON 1
+FROM [Flight Status]
+WHERE [Origin].[State Name].&[California]
+
+-- cau 2 Thống kê tổng các chuyến bay có khoảng cách lớn hơn 800 dặm vào ngày 27-04-2022
+SELECT {[Measures].[Fact Count]} ON COLUMNS,
+FILTER([Dim Time].[Flight Date].&[2022-04-27T00:00:00],
+			[Measures].[Distance] > 800) ON ROWS
+FROM [Flight Status]
+
+-- cau 3	Thống kê số lượng các chuyến bay bị hủy của hãng hàng không Southwest Airlines Co. từ ngày 24-04-2022 đến 27-04-2022 theo từng ngày   
+
+SELECT NON EMPTY { [Measures].[Fact Count] } ON COLUMNS, 
+	NON EMPTY { ([Dim Time].[Flight Date].[Flight Date].ALLMEMBERS ) }
+	ON ROWS 
+	FROM ( SELECT ( [Dim Time].[Flight Date].&[2022-04-24T00:00:00] : [Dim Time].[Flight Date].&[2022-04-27T00:00:00] ) 
+ON COLUMNS FROM ( SELECT ( { [Dim Airline].[Airline Name].&[Southwest Airlines Co.] } ) 
+	ON COLUMNS FROM ( SELECT ( { [Dim Cancelled].[Cancel].&[True] } ) 
+	ON COLUMNS FROM [Flight Status])))
+	WHERE ( [Dim Cancelled].[Cancel].&[True], [Dim Airline].[Airline Name].&[Southwest Airlines Co.] ) 
+
+-- cau 4 Thống kê các thành phố ở bang Florida có ít nhất trên 100 chuyến bay đến trong ngày 27-04-2022.  
+
+SELECT NON EMPTY { [Measures].[Fact Count] } ON COLUMNS, NON EMPTY { ([Origin].[City Name].[City Name].ALLMEMBERS ) }
+ ON ROWS FROM ( SELECT (  GENERATE(
+DrillDownLevel([Origin].[State Name].&[California]),
+
+  ORDER(
+    FILTER(
+      [Origin].[City Name].[City Name].members,
+      [Measures].[Fact Count]>=100
+    ),
+    [Measures].[Fact Count], ASC
+  )
+) ) ON COLUMNS FROM [Flight Status])
+
+
+-- cau 5 Thống kê tổng số chuyến bay khởi hành của hãng hàng không Envoy Air theo từng thành phố. 
+SELECT NON EMPTY { [Measures].[Fact Count] } ON COLUMNS, NON EMPTY {[Origin].[City Name].[City Name] }
+ ON ROWS 
+ FROM [Flight Status]
+ WHERE [Dim Airline].[Airline Name].&[Envoy Air]
+
+ -- cau 6 Thống kê tổng số chuyến bay bị hủy theo từng bang của hãng hàng không Horizon Air .  
+ SELECT NON EMPTY { [Measures].[Fact Count] } ON COLUMNS, 
+	NON EMPTY { ([Origin].[State Name].[State Name].ALLMEMBERS ) } ON ROWS
+		FROM [Flight Status]
+WHERE ([Dim Cancelled].[Cancel].&[True], [Dim Airline].[Airline Name].&[Horizon Air])
+
+-- cau 7 Thống kê số lượng chuyến bay khởi hành của hãng hàng không Frontier Airlines  Inc. bị điều hướng theo từng máy bay
+
+SELECT NON EMPTY { [Measures].[Fact Count] } ON COLUMNS,
+NON EMPTY { ([Dim Plane].[Tail Number].[Tail Number].ALLMEMBERS ) } ON ROWS 
+		FROM [Flight Status]
+		WHERE ( [Dim Diverted].[Diverted].&[True],[Dim Airline].[Airline Name].&[Endeavor Air Inc.] )
+
+
+-- cau 8: Thống kê tổng thời gian cất cánh trễ và tổng thời gian khởi hành trễ của các chuyến bay 
+-- đến thành phố Orlando tính theo các ngày của hãng hàng không Alaska Airline Inc.  
+SELECT
+  {[Measures].[Dep Delay], [Measures].[Arr Delay]} ON COLUMNS,
+  {[Dim Time].[Flight Date].Members} ON ROWS
+FROM [Flight Status]
+WHERE ([Dim Airline].[Airline Name].[Alaska Airlines Inc.], [Dest].[City Name].[Orlando, Fl])
+
+-- cau 9: Thống kê khoảng cách và mã chuyến bay theo từng chiếc máy bay
+SELECT
+  {[Measures].[Flight Number Marketing Airline], [Measures].[Distance]} ON COLUMNS,
+  {[Dim Plane].[Tail Number].Members} ON ROWS
+FROM [Flight Status]
+WHERE [Dim Time].[Quarter].[2]
+
+-- cau 10: Thống kê tổng khoảng cách và tổng thời gian bay theo từng máy  bay từ ngày 24-04-2022 đến ngày 26-04-2022 
+SELECT {[Dim Plane].[Tail Number].[Tail Number].Members} ON ROWS, {[Measures].[Distance], [Measures].[Actual Elapsed Time]} ON COLUMNS
+FROM [Flight Status]
+WHERE ([Dim Time].[Flight Date].&[2022-04-24T00:00:00]: [Dim Time].[Flight Date].&[2022-04-26T00:00:00])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
